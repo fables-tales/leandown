@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+# Usage: server --root /path/to/lean/project [--output /path/to/output] [--port 8000]
+set -e
+
+LEANDOWN_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+
+ROOT=""
+OUTPUT=""
+PORT=8000
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --root)   ROOT="$2";   shift 2 ;;
+    --output) OUTPUT="$2"; shift 2 ;;
+    --port)   PORT="$2";   shift 2 ;;
+    *) echo "Unknown arg: $1"; exit 1 ;;
+  esac
+done
+
+if [[ -z "$ROOT" ]]; then
+  ROOT="$(pwd)"
+fi
+
+if [[ -z "$OUTPUT" ]]; then
+  OUTPUT="$ROOT/leandown_site/output"
+fi
+
+source ~/.nvm/nvm.sh 2>/dev/null || true
+
+rebuild() {
+  echo "rebuilding..."
+  "$LEANDOWN_DIR/.venv/bin/python3" "$LEANDOWN_DIR/build.py" --root "$ROOT" --output "$OUTPUT"
+}
+
+# Initial build
+rebuild
+
+# Watch CSS in background
+(cd "$LEANDOWN_DIR" && npx tailwindcss -i src/input.css -o "$OUTPUT/styles.css" --watch) &
+TAILWIND_PID=$!
+
+# Watch Lean files and build.py, rebuild on any change
+(
+  if command -v fswatch &>/dev/null; then
+    fswatch -o --event Updated "$ROOT" "$LEANDOWN_DIR/build.py" | while read -r _; do
+      rebuild
+    done
+  else
+    # Fallback: poll every 2s
+    while true; do
+      sleep 2
+      if find "$ROOT" -name "*.lean" -newer "$OUTPUT/index.html" 2>/dev/null | grep -q .; then
+        rebuild
+      fi
+    done
+  fi
+) &
+WATCH_PID=$!
+
+cleanup() {
+  kill "$TAILWIND_PID" "$WATCH_PID" 2>/dev/null
+}
+trap cleanup EXIT
+
+echo ""
+echo "serving at http://localhost:$PORT"
+"$LEANDOWN_DIR/.venv/bin/python3" -m http.server "$PORT" --directory "$OUTPUT"
