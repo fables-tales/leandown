@@ -1,0 +1,13 @@
+{
+  "name": "leandown-site",
+  "private": true,
+  "scripts": {
+    "build": "tailwindcss -i src/input.css -o output/styles.css --minify",
+    "dev":   "tailwindcss -i src/input.css -o output/styles.css --watch"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli":        "^4.0.0",
+    "@tailwindcss/typography": "^0.5.15",
+    "tailwindcss":             "^4.0.0"
+  }
+}

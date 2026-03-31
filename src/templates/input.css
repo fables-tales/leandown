@@ -1,0 +1,19 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+/* Scan generated HTML for Tailwind classes */
+@source "../output/**/*.html";
+
+/* ── Customise below ─────────────────────────────────────────────────────── */
+
+/* Inline code in prose: grey pill, no backtick decoration */
+.prose :where(code):not(:where([class~=not-prose],[class~=not-prose] *))::before,
+.prose :where(code):not(:where([class~=not-prose],[class~=not-prose] *))::after {
+  content: none;
+}
+.prose :where(code):not(:where([class~=not-prose],[class~=not-prose] *)) {
+  background-color: oklch(96.7% .003 264.542); /* gray-100 */
+  border-radius: 0.25rem;
+  padding: 0.1em 0.35em;
+  font-weight: 500;
+}
