@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -e
+REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+leandown build --root "$REPO_ROOT" --output "$REPO_ROOT/leandown_site/output"

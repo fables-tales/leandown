@@ -3,6 +3,12 @@ name = "leandown"
 version = "0.1.0"
 edition = "2021"
 description = "Convert annotated Lean 4 files to a static website"
+license = "Apache-2.0"
+authors = ["Fable Tales <penelopedotzone@gmail.com>"]
+repository = "https://github.com/fables-tales/leandown"
+homepage = "https://github.com/fables-tales/leandown"
+keywords = ["lean", "lean4", "documentation", "literate-programming"]
+categories = ["command-line-utilities", "development-tools"]
 
 [[bin]]
 name = "leandown"
