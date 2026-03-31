@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-# Usage: build --root /path/to/lean/project [--output /path/to/output]
-set -e
-
-LEANDOWN_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-
-source ~/.nvm/nvm.sh 2>/dev/null || true
-
-"$LEANDOWN_DIR/.venv/bin/python3" "$LEANDOWN_DIR/build.py" "$@"

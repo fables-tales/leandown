@@ -1,4 +1,2 @@
-.venv/
-node_modules/
-output/
+target/
 __pycache__/
