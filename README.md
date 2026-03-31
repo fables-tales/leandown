@@ -16,14 +16,22 @@ For CSS bundling, Node.js and npm are needed once per project (see [Frontend bun
 
 ## Quick start
 
-```sh
-# 1. Scaffold the frontend bundle and install CSS dependencies
-leandown init path/to/your/project
+`leandown init` must be run from the root of an existing Lake project — the same
+directory that contains your `lakefile.toml`. It will error early if no lakefile
+is found there.
 
-# 2. Build the site
+```sh
+# Create a new Lean project (skip if you have one already)
+lake init myproject lib
+cd myproject
+
+# Scaffold the frontend bundle and install CSS dependencies
+leandown init .
+
+# Build the site
 leandown_site/script/build
 
-# 3. Or start the dev server (rebuilds on .lean and CSS changes)
+# Or start the dev server (rebuilds on .lean and CSS changes)
 leandown_site/script/server
 ```
 
@@ -129,7 +137,7 @@ builds don't fail in CI.
 ## Commands
 
 ```
-leandown init [ROOT]            Scaffold leandown_site/ (safe to re-run)
+leandown init [ROOT]            Scaffold leandown_site/ alongside lakefile.toml (safe to re-run)
 leandown build [--root ROOT]    Build the site; validates each file with `lake build`
 leandown serve [--root ROOT]    Build, watch .lean files, and serve on localhost:8000
                [--output DIR]   Override the output directory

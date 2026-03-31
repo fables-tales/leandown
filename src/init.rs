@@ -11,6 +11,7 @@ const TPL_SCRIPT_SERVER: &str = include_str!("templates/script_server");
 /// Scaffold a leandown frontend bundle inside `<root>/leandown_site/`.
 /// Skips files that already exist so re-running init is safe.
 pub fn init(root: &Path) -> Result<()> {
+    check_lake_project(root)?;
     check_dependencies();
 
     let site_dir   = root.join("leandown_site");
@@ -43,6 +44,27 @@ pub fn init(root: &Path) -> Result<()> {
     println!("\nDone! Use the convenience scripts from your project root:");
     println!("  leandown_site/script/build    # one-shot build");
     println!("  leandown_site/script/server   # dev server with live reload");
+
+    Ok(())
+}
+
+/// Verify that `root` looks like a Lake project root (has a lakefile).
+/// Errors early with a clear message rather than silently producing an empty site.
+fn check_lake_project(root: &Path) -> Result<()> {
+    let has_lakefile = root.join("lakefile.toml").exists()
+        || root.join("lakefile.lean").exists();
+
+    if !has_lakefile {
+        eprintln!("error: no lakefile found in {}", root.display());
+        eprintln!();
+        eprintln!("  leandown init must be run from the root of a Lake project,");
+        eprintln!("  alongside your lakefile.toml.");
+        eprintln!();
+        eprintln!("  To create a new Lean project first:");
+        eprintln!("    lake init <name> lib");
+        eprintln!("    leandown init .");
+        std::process::exit(1);
+    }
 
     Ok(())
 }
