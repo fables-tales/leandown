@@ -1,5 +1,6 @@
 use anyhow::{Context, Result};
 use std::path::Path;
+use std::process::Command;
 
 const TPL_PACKAGE_JSON: &str  = include_str!("templates/package.json");
 const TPL_INPUT_CSS: &str     = include_str!("templates/input.css");
@@ -10,6 +11,8 @@ const TPL_SCRIPT_SERVER: &str = include_str!("templates/script_server");
 /// Scaffold a leandown frontend bundle inside `<root>/leandown_site/`.
 /// Skips files that already exist so re-running init is safe.
 pub fn init(root: &Path) -> Result<()> {
+    check_dependencies();
+
     let site_dir   = root.join("leandown_site");
     let src_dir    = site_dir.join("src");
     let out_dir    = site_dir.join("output");
@@ -26,15 +29,44 @@ pub fn init(root: &Path) -> Result<()> {
     write_script(&script_dir.join("build"),  TPL_SCRIPT_BUILD)?;
     write_script(&script_dir.join("server"), TPL_SCRIPT_SERVER)?;
 
-    println!("\nInitialised leandown in {}/", site_dir.display());
-    println!("\nNext steps:");
-    println!("  cd {}", site_dir.display());
-    println!("  npm install");
-    println!("\nThen use the convenience scripts:");
+    println!("\nRunning npm install...");
+    let status = Command::new("npm")
+        .arg("install")
+        .current_dir(&site_dir)
+        .status()
+        .context("failed to run npm install — is npm installed?")?;
+
+    if !status.success() {
+        anyhow::bail!("npm install failed");
+    }
+
+    println!("\nDone! Use the convenience scripts from your project root:");
     println!("  leandown_site/script/build    # one-shot build");
     println!("  leandown_site/script/server   # dev server with live reload");
 
     Ok(())
+}
+
+/// Warn about missing tools before doing any work.
+fn check_dependencies() {
+    if !command_exists("lake") {
+        eprintln!("warning: lake not found — Lean files will not be validated during build.");
+        eprintln!("         Install Lean via elan: https://github.com/leanprover/elan");
+    }
+    if !command_exists("npm") {
+        eprintln!("error:   npm not found — cannot install the CSS bundler.");
+        eprintln!("         Install Node.js from https://nodejs.org");
+        std::process::exit(1);
+    }
+}
+
+fn command_exists(name: &str) -> bool {
+    Command::new(name)
+        .arg("--version")
+        .stdout(std::process::Stdio::null())
+        .stderr(std::process::Stdio::null())
+        .status()
+        .is_ok()
 }
 
 fn write_if_new(path: &Path, content: &str) -> Result<()> {

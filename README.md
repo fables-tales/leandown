@@ -17,17 +17,13 @@ For CSS bundling, Node.js and npm are needed once per project (see [Frontend bun
 ## Quick start
 
 ```sh
-# 1. Scaffold the frontend bundle in your Lean project
+# 1. Scaffold the frontend bundle and install CSS dependencies
 leandown init path/to/your/project
 
-# 2. Install CSS dependencies
-cd path/to/your/project/leandown_site
-npm install
-
-# 3. Build the site
+# 2. Build the site
 leandown_site/script/build
 
-# 4. Or start the dev server (rebuilds on .lean and CSS changes)
+# 3. Or start the dev server (rebuilds on .lean and CSS changes)
 leandown_site/script/server
 ```
 
@@ -113,7 +109,7 @@ leandown_site/
   output/            ← generated site (created on first build)
 ```
 
-After `npm install`, use the scripts from your project root:
+`leandown init` runs `npm install` automatically. Use the scripts from your project root:
 
 ```sh
 leandown_site/script/build    # build once
